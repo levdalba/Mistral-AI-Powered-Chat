@@ -12,20 +12,59 @@ A high-performance FastAPI backend service that integrates with Mistral AI for c
 
 ## Quick Start
 
-1. **Install dependencies**
+### Option 1: Automated Setup (Recommended)
+
+**macOS/Linux:**
+```bash
+# Make setup script executable and run
+chmod +x setup.sh
+./setup.sh
+```
+
+**Windows:**
+```cmd
+# Run the batch setup script
+setup.bat
+```
+
+### Option 2: Manual Setup
+
+1. **Create virtual environment**
    ```bash
-   pip install -r requirements.txt
+   # Create virtual environment
+   python3 -m venv venv
+   
+   # Activate virtual environment
+   # macOS/Linux:
+   source venv/bin/activate
+   # Windows:
+   venv\Scripts\activate
    ```
 
-2. **Set up environment**
+2. **Install dependencies**
+   ```bash
+   # Upgrade pip
+   pip install --upgrade pip
+   
+   # Install production dependencies
+   pip install -r requirements.txt
+   
+   # Install development dependencies (optional)
+   pip install -r requirements-dev.txt
+   ```
+
+3. **Set up environment**
    ```bash
    cp .env.example .env
    # Edit .env with your configurations
    ```
 
-3. **Run the server**
+4. **Run the server**
    ```bash
    uvicorn app.main:app --reload --port 8000
+   
+   # Or use the Makefile (if available)
+   make dev
    ```
 
 4. **View API documentation**
@@ -100,16 +139,49 @@ RATE_LIMIT_PER_MINUTE=60
 
 ## Development
 
+### Virtual Environment Management
+
+Always use a virtual environment for development:
+
+```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+# or
+venv\Scripts\activate     # Windows
+
+# Install all dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# Deactivate when done
+deactivate
+```
+
+### Available Commands
+
+Using the Makefile (macOS/Linux):
+```bash
+make help          # Show available commands
+make setup         # Create virtual environment
+make install       # Install dependencies
+make dev           # Start development server
+make test          # Run tests
+make lint          # Run linting
+make format        # Format code
+make clean         # Clean temporary files
+```
+
 ### Code Quality
 
 ```bash
-# Format code
-black app/
-isort app/
-
 # Lint code
 flake8 app/
 mypy app/
+
+# Format code
+black app/
+isort app/
 
 # Run tests
 pytest
