@@ -184,55 +184,63 @@ mistral-ai-chat/
 
 ## 🚀 Deployment Options
 
-### Frontend Deployment
+### Quick Deployment Summary
 
-**Vercel (Recommended)**
+**Frontend Options:**
+- 🥇 **Vercel** (Recommended) - Zero-config Next.js deployment
+- 🥈 **Netlify** - Simple drag-and-drop deployment  
+- 🥉 **GitHub Pages** - Free static hosting
+
+**Backend Options:**
+- 🥇 **Railway** (Recommended) - Python-focused platform
+- 🥈 **Render** - Full-stack hosting platform
+- 🥉 **Heroku** - Classic PaaS solution
+
+### Frontend Deployment (Vercel)
+
 ```bash
-# Connect your GitHub repository to Vercel
-# Set environment variables in Vercel dashboard:
-# NEXT_PUBLIC_API_BASE_URL=https://your-backend-url.com
+# 1. Connect GitHub repository to Vercel
+# 2. Configure build settings:
+Framework: Next.js
+Root Directory: frontend
+Build Command: npm run build
 
-# Automatic deployment on git push
+# 3. Set environment variables:
+NEXT_PUBLIC_API_BASE_URL=https://your-backend-url.railway.app
+
+# 4. Deploy automatically on git push
 ```
 
-**Netlify Alternative**
+### Backend Deployment (Railway)
+
 ```bash
-npm run build
-# Upload dist/ folder to Netlify
-# Set environment variables in Netlify dashboard
+# 1. Connect GitHub repository to Railway
+# 2. Configure service:
+Root Directory: backend
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+# 3. Set environment variables:
+MISTRAL_API_KEY=your_mistral_api_key_here
+PORT=8000
+
+# 4. Deploy automatically on git push
 ```
 
-### Backend Deployment
+### Docker Deployment
 
-**Railway (Recommended)**
 ```bash
-# Connect repository to Railway
-# Set environment variables:
-# MISTRAL_API_KEY=your_key_here
-# PORT=8000
-
-# Automatic deployment on git push
-```
-
-**Render Alternative**
-```bash
-# Connect repository to Render
-# Use Python environment
-# Start command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
-
-**Docker Deployment**
-```bash
-# Backend Dockerfile
+# Backend
 cd backend
 docker build -t mistral-chat-backend .
 docker run -p 8000:8000 -e MISTRAL_API_KEY=your_key mistral-chat-backend
 
-# Frontend Dockerfile  
+# Frontend  
 cd frontend
 docker build -t mistral-chat-frontend .
 docker run -p 3000:3000 mistral-chat-frontend
 ```
+
+📚 **For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
 
 ## 🧪 Testing
 
