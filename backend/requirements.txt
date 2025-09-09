@@ -8,7 +8,6 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 sqlalchemy==2.0.23
 alembic==1.13.1
-sqlite3
 
 # Document processing
 pypdf2==3.0.1
@@ -17,7 +16,7 @@ langchain==0.0.350
 langchain-community==0.0.8
 
 # Vector operations
-faiss-cpu==1.7.4
+faiss-cpu==1.9.0.post1
 sentence-transformers==2.2.2
 
 # HTTP client

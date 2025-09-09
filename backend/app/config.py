@@ -6,9 +6,9 @@ database settings, and service configurations.
 """
 
 from functools import lru_cache
-from typing import List
+from typing import List, Union
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -18,10 +18,11 @@ class Settings(BaseSettings):
     # Application
     app_name: str = Field(default="Mistral AI Chat Backend", description="Application name")
     debug: bool = Field(default=False, description="Debug mode")
+    mock_mode: bool = Field(default=False, description="Enable mock responses for development")
     version: str = Field(default="1.0.0", description="Application version")
     
     # Mistral AI Configuration
-    mistral_api_key: str = Field(..., description="Mistral AI API key")
+    mistral_api_key: str = Field(default="mock-key-for-development", description="Mistral AI API key")
     mistral_model: str = Field(default="mistral-large-latest", description="Default Mistral model")
     mistral_base_url: str = Field(default="https://api.mistral.ai", description="Mistral API base URL")
     
@@ -34,7 +35,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(default=30, description="JWT token expiration")
     
     # CORS
-    allowed_origins: List[str] = Field(
+    allowed_origins: Union[List[str], str] = Field(
         default=["http://localhost:3000"], 
         description="Allowed CORS origins"
     )
@@ -42,10 +43,24 @@ class Settings(BaseSettings):
     # File Upload
     max_file_size_mb: int = Field(default=10, description="Maximum file size in MB")
     upload_directory: str = Field(default="./uploads", description="Upload directory path")
-    allowed_file_types: List[str] = Field(
+    allowed_file_types: Union[List[str], str] = Field(
         default=["pdf", "txt", "docx"], 
         description="Allowed file extensions"
     )
+    
+    @field_validator('allowed_origins')
+    @classmethod
+    def validate_allowed_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(',') if origin.strip()]
+        return v
+    
+    @field_validator('allowed_file_types')
+    @classmethod
+    def validate_allowed_file_types(cls, v):
+        if isinstance(v, str):
+            return [file_type.strip() for file_type in v.split(',') if file_type.strip()]
+        return v
     
     # Rate Limiting
     rate_limit_per_minute: int = Field(default=60, description="Rate limit per minute")

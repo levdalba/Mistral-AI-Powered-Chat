@@ -6,6 +6,7 @@ conversation management, and integration with Mistral AI models.
 """
 
 import time
+import asyncio
 from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import uuid4
@@ -13,6 +14,7 @@ from uuid import uuid4
 import structlog
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage as MistralChatMessage
+from mistralai.exceptions import MistralException
 
 from app.config import get_settings
 from app.models.chat import (
@@ -47,7 +49,13 @@ class ChatService:
         conversation history and metrics.
         """
         try:
-            self.client = MistralClient(api_key=settings.mistral_api_key)
+            # Initialize client only if not in mock mode
+            if not settings.mock_mode:
+                self.client = MistralClient(api_key=settings.mistral_api_key)
+            else:
+                self.client = None
+                logger.info("Chat service initialized in mock mode")
+                
             # In-memory storage for demo purposes
             # In production, this would be replaced with a database
             self.conversations: Dict[str, List[ChatMessage]] = {}
@@ -115,26 +123,109 @@ class ChatService:
                 context_messages=len(mistral_messages),
             )
             
-            # Call Mistral AI
-            response = self.client.chat(
-                model=model,
-                messages=mistral_messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
-            
-            end_time = time.time()
-            response_time_ms = (end_time - start_time) * 1000
-            
-            # Extract response content
-            ai_message_content = response.choices[0].message.content
-            finish_reason = response.choices[0].finish_reason
-            
-            # Calculate token usage
-            usage = response.usage
-            tokens_used = usage.total_tokens
-            prompt_tokens = usage.prompt_tokens
-            completion_tokens = usage.completion_tokens
+            # Check if in mock mode
+            if settings.mock_mode:
+                # Simulate processing time
+                import asyncio
+                await asyncio.sleep(0.5)  # Simulate API delay
+                
+                # Generate mock response
+                ai_message_content = self._generate_mock_response(message)
+                finish_reason = "stop"
+                tokens_used = len(message.split()) + len(ai_message_content.split())
+                prompt_tokens = len(message.split()) * 2  # Rough estimate
+                completion_tokens = len(ai_message_content.split())
+                
+                end_time = time.time()
+                response_time_ms = (end_time - start_time) * 1000
+                
+                logger.info("Generated mock response", response_length=len(ai_message_content))
+            else:
+                # Call Mistral AI with retry logic for rate limiting
+                max_retries = 3
+                base_delay = 1.0  # Base delay in seconds
+                
+                for attempt in range(max_retries + 1):
+                    try:
+                        response = self.client.chat(
+                            model=model,
+                            messages=mistral_messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens,
+                        )
+                        break  # Success, exit retry loop
+                        
+                    except Exception as e:
+                        error_message = str(e)
+                        if '429' in error_message or 'rate limit' in error_message.lower() or 'capacity exceeded' in error_message.lower():
+                            # Rate limit exceeded
+                            if attempt < max_retries:
+                                delay = base_delay * (2 ** attempt)  # Exponential backoff
+                                logger.warning(
+                                    f"Rate limit exceeded, retrying in {delay}s (attempt {attempt + 1}/{max_retries + 1})",
+                                    error=str(e)
+                                )
+                                time.sleep(delay)  # Use time.sleep instead of asyncio.sleep
+                                continue
+                            else:
+                                # Max retries exceeded, try fallback model
+                                logger.error("Max retries exceeded, trying fallback model")
+                                fallback_model = "mistral-small-latest"
+                                if model != fallback_model:
+                                    logger.info(f"Switching to fallback model: {fallback_model}")
+                                    try:
+                                        response = self.client.chat(
+                                            model=fallback_model,
+                                            messages=mistral_messages,
+                                            temperature=temperature,
+                                            max_tokens=max_tokens,
+                                        )
+                                        model = fallback_model  # Update model for metadata
+                                        break
+                                    except Exception as fallback_error:
+                                        logger.error("Fallback model also failed, using mock response")
+                                        ai_message_content = self._generate_mock_response(message)
+                                        finish_reason = "rate_limit_fallback"
+                                        tokens_used = len(ai_message_content.split())
+                                        prompt_tokens = len(message.split())
+                                        completion_tokens = tokens_used - prompt_tokens
+                                        end_time = time.time()
+                                        response_time_ms = (end_time - start_time) * 1000
+                                        break
+                                else:
+                                    # Already using fallback, enable mock mode temporarily
+                                    logger.error("Fallback model also rate limited, using mock response")
+                                    ai_message_content = self._generate_mock_response(message)
+                                    finish_reason = "rate_limit_fallback"
+                                    tokens_used = len(ai_message_content.split())
+                                    prompt_tokens = len(message.split())
+                                    completion_tokens = tokens_used - prompt_tokens
+                                    end_time = time.time()
+                                    response_time_ms = (end_time - start_time) * 1000
+                                    break
+                        else:
+                            # Other error, re-raise after max retries
+                            if attempt < max_retries:
+                                delay = base_delay * (2 ** attempt)
+                                logger.warning(f"API error, retrying in {delay}s", error=str(e))
+                                time.sleep(delay)
+                            else:
+                                raise e
+                
+                # If we got a successful response from the API
+                if 'response' in locals() and response is not None:
+                    end_time = time.time()
+                    response_time_ms = (end_time - start_time) * 1000
+                    
+                    # Extract response content
+                    ai_message_content = response.choices[0].message.content
+                    finish_reason = response.choices[0].finish_reason
+                    
+                    # Calculate token usage
+                    usage = response.usage
+                    tokens_used = usage.total_tokens
+                    prompt_tokens = usage.prompt_tokens
+                    completion_tokens = usage.completion_tokens
             
             # Create response message
             ai_message = ChatMessage(
@@ -487,3 +578,54 @@ class ChatService:
             max_response_time_ms=max_response_time,
             total_cost_estimate=total_cost_estimate,
         )
+
+    def _generate_mock_response(self, message: str) -> str:
+        """
+        Generate a mock response for development/testing.
+        
+        Args:
+            message: User message to respond to
+            
+        Returns:
+            str: Mock AI response
+        """
+        import random
+        
+        # Simple keyword-based responses for testing
+        message_lower = message.lower()
+        
+        if any(word in message_lower for word in ['hello', 'hi', 'hey', 'greetings']):
+            responses = [
+                "Hello! I'm a Mistral AI assistant. How can I help you today?",
+                "Hi there! I'm here to assist you with any questions or tasks.",
+                "Greetings! I'm ready to help you with information, analysis, or creative tasks."
+            ]
+        elif any(word in message_lower for word in ['how are you', 'how do you feel']):
+            responses = [
+                "I'm functioning well and ready to assist you! As an AI, I don't experience emotions, but I'm optimized for helping users.",
+                "I'm doing great, thank you for asking! I'm here and ready to help with whatever you need."
+            ]
+        elif any(word in message_lower for word in ['what can you do', 'help', 'capabilities']):
+            responses = [
+                "I can help with a wide variety of tasks including:\n• Answering questions and providing information\n• Writing and editing text\n• Code analysis and programming help\n• Creative writing and brainstorming\n• Data analysis and explanations\n• And much more! What would you like to work on?"
+            ]
+        elif any(word in message_lower for word in ['code', 'programming', 'python', 'javascript']):
+            responses = [
+                "I'd be happy to help with programming! I can assist with code review, debugging, explaining concepts, writing functions, and more. What specific coding challenge are you working on?",
+                "Great! I enjoy helping with code. Whether you need help with Python, JavaScript, or other languages, I can assist with syntax, best practices, debugging, and algorithm design."
+            ]
+        elif '?' in message:
+            responses = [
+                f"That's an interesting question about '{message[:50]}...'. Let me provide you with a thoughtful response based on the information available.",
+                "Thank you for your question. Based on what you've asked, here's what I can tell you:",
+                "I understand you're asking about this topic. Let me share some insights that might be helpful."
+            ]
+        else:
+            responses = [
+                f"I understand you mentioned: '{message[:50]}...'. That's an interesting topic! Let me provide some relevant information and insights.",
+                "Thank you for sharing that with me. I'd be happy to discuss this further or help you explore related aspects.",
+                "That's a great point to bring up. Based on what you've shared, here are some thoughts and additional perspectives.",
+                "I appreciate you bringing this up. This is definitely something worth exploring in more detail."
+            ]
+        
+        return random.choice(responses)
