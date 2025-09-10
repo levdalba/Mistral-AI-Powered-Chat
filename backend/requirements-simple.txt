@@ -1,0 +1,8 @@
+# Ultra-minimal requirements for guaranteed deployment
+fastapi
+uvicorn[standard]
+mistralai
+pydantic>=2.0
+python-multipart
+httpx
+structlog
