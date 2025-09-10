@@ -247,7 +247,7 @@ export default function MessageList({
                                                 onChange={(e) =>
                                                     setEditText(e.target.value)
                                                 }
-                                                className="w-full p-2 border rounded-md resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                className="w-full p-2 border rounded-md resize-none text-gray-900 bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 rows={3}
                                                 autoFocus
                                             />

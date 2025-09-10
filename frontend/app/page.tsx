@@ -7,13 +7,22 @@
  * Features include real-time messaging, conversation history, and document upload.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ChatInterface from '@/components/chat/ChatInterface'
 import ChatSidebar from '@/components/chat/ChatSidebar'
 import ConnectionStatus from '@/components/ConnectionStatus'
+import { useChatStore } from '@/lib/stores/chatStore'
 
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const { currentConversationId, conversations, createNewConversation } = useChatStore()
+
+    // Automatically create a new conversation when the page loads if none exists
+    useEffect(() => {
+        if (!currentConversationId && conversations.length === 0) {
+            createNewConversation()
+        }
+    }, [currentConversationId, conversations.length, createNewConversation])
 
     return (
         <>
