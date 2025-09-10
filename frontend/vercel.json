@@ -1,0 +1,13 @@
+{
+  "name": "mistral-ai-chat",
+  "version": 2,
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_BASE_URL": "https://mistral-ai-powered-chat.onrender.com"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_BASE_URL": "https://mistral-ai-powered-chat.onrender.com"
+    }
+  }
+}

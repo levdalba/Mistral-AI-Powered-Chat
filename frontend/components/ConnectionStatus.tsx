@@ -18,7 +18,8 @@ export default function ConnectionStatus({
 
     const checkConnection = async () => {
         try {
-            const response = await fetch('http://localhost:8000/health')
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
+            const response = await fetch(`${apiBaseUrl}/health`)
             const isOk = response.ok
             setIsConnected(isOk)
             setLastChecked(new Date())
