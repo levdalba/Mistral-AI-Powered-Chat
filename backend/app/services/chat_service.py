@@ -12,8 +12,7 @@ from typing import Dict, List, Optional
 from uuid import uuid4
 
 import structlog
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage as MistralChatMessage
+from mistralai import Mistral
 from mistralai.exceptions import MistralException
 
 from app.config import get_settings
@@ -51,7 +50,7 @@ class ChatService:
         try:
             # Initialize client only if not in mock mode
             if not settings.mock_mode:
-                self.client = MistralClient(api_key=settings.mistral_api_key)
+                self.client = Mistral(api_key=settings.mistral_api_key)
             else:
                 self.client = None
                 logger.info("Chat service initialized in mock mode")
@@ -112,7 +111,7 @@ class ChatService:
             
             # Convert to Mistral format
             mistral_messages = [
-                MistralChatMessage(role=msg.role.value, content=msg.content)
+                {"role": msg.role.value, "content": msg.content}
                 for msg in messages
             ]
             
