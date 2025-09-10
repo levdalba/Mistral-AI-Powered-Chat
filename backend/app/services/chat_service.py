@@ -13,7 +13,6 @@ from uuid import uuid4
 
 import structlog
 from mistralai import Mistral
-from mistralai.exceptions import MistralException
 
 from app.config import get_settings
 from app.models.chat import (

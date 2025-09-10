@@ -90,7 +90,7 @@ class ResponseMetadata(BaseModel):
     
     class Config:
         """Pydantic configuration for ResponseMetadata."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "model_used": "mistral-large-latest",
                 "tokens_used": 150,
@@ -117,7 +117,7 @@ class ChatMessageResponse(BaseModel):
     
     class Config:
         """Pydantic configuration for ChatMessageResponse."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "message": {
                     "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -178,7 +178,7 @@ class ConversationHistory(BaseModel):
     
     class Config:
         """Pydantic configuration for ConversationHistory."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "conversation_id": "conv_123",
                 "messages": [
@@ -235,7 +235,7 @@ class ConversationMetrics(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat(),
         }
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "conversation_id": "conv_123",
                 "title": "Technical Discussion",

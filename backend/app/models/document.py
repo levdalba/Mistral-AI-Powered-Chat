@@ -80,7 +80,7 @@ class DocumentChunk(BaseModel):
     
     class Config:
         """Pydantic configuration for DocumentChunk."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "chunk_id": "chunk_123_001",
                 "document_id": "doc_123",
@@ -129,7 +129,7 @@ class DocumentQueryResponse(BaseModel):
     
     class Config:
         """Pydantic configuration for DocumentQueryResponse."""
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "question": "What is the main topic of this document?",
                 "answer": "The main topic discusses...",
