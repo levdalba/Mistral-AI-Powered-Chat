@@ -31,27 +31,39 @@ fi
 
 # Test 3: Frontend Accessibility
 echo -n "3. Frontend Server: "
-if curl -s http://localhost:3000 >/dev/null; then
+if curl -s http://localhost:3001 >/dev/null; then
     echo "✅ PASSED"
 else
-    echo "❌ FAILED - Frontend not responding"
+    if curl -s http://localhost:3000 >/dev/null; then
+        echo "✅ PASSED (port 3000)"
+    else
+        echo "❌ FAILED - Frontend not responding"
+    fi
 fi
 
 # Test 4: CORS Configuration
 echo -n "4. CORS Configuration: "
 CORS_RESPONSE=$(curl -s -I -X OPTIONS http://localhost:8000/api/chat/message \
-    -H "Origin: http://localhost:3000" \
+    -H "Origin: http://localhost:3001" \
     -H "Access-Control-Request-Method: POST")
 
 if echo "$CORS_RESPONSE" | grep -q "Access-Control-Allow-Origin"; then
     echo "✅ PASSED"
 else
-    echo "❌ FAILED - CORS not configured properly"
+    # Try with port 3000
+    CORS_RESPONSE=$(curl -s -I -X OPTIONS http://localhost:8000/api/chat/message \
+        -H "Origin: http://localhost:3000" \
+        -H "Access-Control-Request-Method: POST")
+    if echo "$CORS_RESPONSE" | grep -q "Access-Control-Allow-Origin"; then
+        echo "✅ PASSED (port 3000)"
+    else
+        echo "❌ FAILED - CORS not configured properly"
+    fi
 fi
 
 echo ""
 echo "🎉 Testing Complete!"
 echo ""
-echo "📱 Frontend: http://localhost:3000"
+echo "📱 Frontend: http://localhost:3001 or http://localhost:3000"
 echo "🔗 Backend API: http://localhost:8000"
 echo "📚 API Docs: http://localhost:8000/docs"

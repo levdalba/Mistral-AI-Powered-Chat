@@ -30,13 +30,19 @@ class Settings(BaseSettings):
     database_url: str = Field(default="sqlite:///./mistral_chat.db", description="Database connection URL")
     
     # Security
-    secret_key: str = Field(..., description="Secret key for JWT tokens")
+    secret_key: str = Field(default="development-secret-key-change-in-production", description="Secret key for JWT tokens")
     algorithm: str = Field(default="HS256", description="JWT algorithm")
     access_token_expire_minutes: int = Field(default=30, description="JWT token expiration")
     
     # CORS
     allowed_origins: Union[List[str], str] = Field(
-        default=["http://localhost:3000"], 
+        default=[
+            "http://localhost:3000",
+            "http://localhost:3001", 
+            "https://*.vercel.app",
+            "https://*.netlify.app",
+            "https://*.railway.app"
+        ], 
         description="Allowed CORS origins"
     )
     

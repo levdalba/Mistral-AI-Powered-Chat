@@ -5,7 +5,6 @@
  */
 
 import { useEffect, useState } from 'react'
-import { Wifi, WifiOff } from 'lucide-react'
 
 interface ConnectionStatusProps {
     className?: string
@@ -43,14 +42,14 @@ export default function ConnectionStatus({
         <div className={`flex items-center space-x-2 text-sm ${className}`}>
             {isConnected ? (
                 <>
-                    <Wifi className="w-4 h-4 text-green-500" />
+                    <span className="text-green-500">📶</span>
                     <span className="text-green-600 dark:text-green-400">
                         Connected
                     </span>
                 </>
             ) : (
                 <>
-                    <WifiOff className="w-4 h-4 text-red-500" />
+                    <span className="text-red-500">📵</span>
                     <span className="text-red-600 dark:text-red-400">
                         Disconnected
                     </span>

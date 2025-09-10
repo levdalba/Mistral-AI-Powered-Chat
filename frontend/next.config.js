@@ -10,8 +10,8 @@ const nextConfig = {
 
     // Experimental features
     experimental: {
-        // Enable optimized images
-        optimizeCss: true,
+        // Disabled optimizeCss due to critters module issue
+        // optimizeCss: true,
     },
 
     // Image optimization

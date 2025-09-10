@@ -7,6 +7,7 @@ It sets up the FastAPI app with all necessary middleware, routers, and configura
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+from datetime import datetime
 
 import structlog
 from fastapi import FastAPI, HTTPException
@@ -158,7 +159,7 @@ async def health_check() -> JSONResponse:
             content={
                 "status": "healthy",
                 "version": settings.version,
-                "timestamp": "2024-01-01T00:00:00Z",  # Add actual timestamp
+                "timestamp": datetime.utcnow().isoformat() + "Z",
             }
         )
     except Exception as e:

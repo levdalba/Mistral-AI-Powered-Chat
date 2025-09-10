@@ -31,7 +31,6 @@
     "framer-motion": "^10.16.16",
     "highlight.js": "^11.9.0",
     "idb": "^7.1.1",
-    "lucide-react": "^0.303.0",
     "next": "^14.2.32",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.32",
