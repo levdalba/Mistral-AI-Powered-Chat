@@ -1,0 +1,18 @@
+# Deployment-friendly requirements for Render
+# Using pre-compiled wheels to avoid compilation issues
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+mistralai==0.0.12
+
+# Use newer pydantic version with better wheel support
+pydantic==2.8.2
+pydantic-settings==2.4.0
+
+python-multipart==0.0.6
+
+# HTTP client
+httpx==0.25.2
+
+# Monitoring and logging
+structlog==23.2.0
