@@ -1,32 +1,43 @@
 # Mistral AI-Powered Chat Assistant
 
-A sophisticated full-stack web application featuring a Claude-like chat interface powered by Mistral AI, built with modern web technologies and production-ready features.
+A production-ready full-stack chat application with a Claude-like interface powered by Mistral AI.
 
-## 🚀 Features
+## 🚀 Live Demo
 
-### Advanced Chat Interface
+- **Frontend**: [https://mistral-ai-chat-i95thqx45-levdalbas-projects.vercel.app](https://mistral-ai-chat-i95thqx45-levdalbas-projects.vercel.app)
+- **Backend API**: [https://mistral-ai-powered-chat.onrender.com](https://mistral-ai-powered-chat.onrender.com)
 
--   **Claude-like UX**: Modern chat UI with hover actions for copy, edit, and resend
--   **Real-time Conversations**: Seamless interaction with Mistral AI models
--   **Message Management**: Edit messages with conversation regeneration
--   **Smart Controls**: Stop generation, redo last message, and conversation controls
--   **Conversation History**: Persistent chat history with proper scrolling
--   **Responsive Design**: Mobile-first design with Tailwind CSS animations
+## ✨ Features
 
-### Production-Ready Backend
+### 🎯 User Experience
+- **Claude-like Interface**: Modern chat UI with hover actions for copy, edit, and resend
+- **Auto-Chat Creation**: Automatically creates new conversation on homepage visit
+- **Message Management**: Edit messages with conversation regeneration
+- **Real-time Responses**: Seamless interaction with Mistral AI models
+- **Responsive Design**: Mobile-first design with smooth animations
 
--   **Sophisticated Rate Limiting**: Exponential backoff with automatic retry logic
--   **Fallback Models**: Automatic switching between Mistral AI models for reliability
--   **Comprehensive Error Handling**: Graceful degradation and user-friendly error messages
--   **Performance Monitoring**: Built-in logging and response time tracking
--   **CORS Configuration**: Secure cross-origin resource sharing setup
+### 🛡️ Production Features
+- **Rate Limiting**: Exponential backoff with automatic retry logic
+- **Fallback Models**: Automatic switching between Mistral AI models
+- **Error Handling**: Graceful degradation and user-friendly messages
+- **CORS Security**: Properly configured cross-origin resource sharing
+- **Environment Management**: Separate configs for development and production
 
-### Developer Experience
+## 🏗️ Tech Stack
 
--   **Type Safety**: Full TypeScript implementation with strict mode
--   **Modern Architecture**: Component-based design with proper separation of concerns
--   **State Management**: Zustand for efficient and predictable state updates
--   **Testing Ready**: Integration test scripts and comprehensive error handling
+### Frontend
+- **Next.js 14** with App Router
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **Zustand** for state management
+- **Deployed on Vercel**
+
+### Backend
+- **FastAPI** with Python 3.11
+- **Mistral AI SDK** for AI integration
+- **Pydantic v2** for data validation
+- **Structured Logging** with error tracking
+- **Deployed on Render**
 
 ## 🏗️ Architecture
 
