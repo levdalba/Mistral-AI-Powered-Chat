@@ -145,7 +145,7 @@ class ChatService:
                 
                 for attempt in range(max_retries + 1):
                     try:
-                        response = self.client.chat(
+                        response = self.client.chat.complete(
                             model=model,
                             messages=mistral_messages,
                             temperature=temperature,
@@ -172,7 +172,7 @@ class ChatService:
                                 if model != fallback_model:
                                     logger.info(f"Switching to fallback model: {fallback_model}")
                                     try:
-                                        response = self.client.chat(
+                                        response = self.client.chat.complete(
                                             model=fallback_model,
                                             messages=mistral_messages,
                                             temperature=temperature,
