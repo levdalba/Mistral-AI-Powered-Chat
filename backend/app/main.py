@@ -88,7 +88,7 @@ app = FastAPI(
 # Add security middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"] if settings.debug else ["localhost", "127.0.0.1"],
+    allowed_hosts=["*"] if settings.debug else ["localhost", "127.0.0.1", "mistral-ai-powered-chat.onrender.com"],
 )
 
 # Add CORS middleware
